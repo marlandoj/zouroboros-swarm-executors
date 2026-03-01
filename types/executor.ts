@@ -1,0 +1,75 @@
+/**
+ * Type definitions for the zo-swarm-executors registry.
+ *
+ * These interfaces define the schema for executor-registry.json
+ * and the resolved executor objects used at runtime.
+ */
+
+/** Environment variable documentation (name → description). */
+export type EnvVarDocs = Record<string, string>;
+
+/** Configuration block for an executor. */
+export interface ExecutorConfig {
+  /** Default timeout in seconds for bridge invocation. */
+  defaultTimeout: number;
+  /** Default model identifier (null = executor's own default). */
+  model: string | null;
+  /** Documented environment variables the bridge respects. */
+  envVars: EnvVarDocs;
+}
+
+/** Health check definition for an executor. */
+export interface HealthCheck {
+  /** Shell command to run (exit 0 = healthy). */
+  command: string;
+  /** Optional regex pattern expected in stdout. */
+  expectedPattern: string;
+  /** Human-readable description of what the check verifies. */
+  description: string;
+}
+
+/** A single executor entry in the registry. */
+export interface ExecutorEntry {
+  /** Unique identifier (e.g. "claude-code", "hermes"). */
+  id: string;
+  /** Human-readable display name. */
+  name: string;
+  /** Executor type — "local" for bridge-based executors. */
+  executor: "local";
+  /** Path to the bridge script, relative to WORKSPACE root. */
+  bridge: string;
+  /** Short description of the executor's capabilities. */
+  description: string;
+  /** Tags describing areas of expertise. */
+  expertise: string[];
+  /** Human-readable descriptions of ideal use cases. */
+  best_for: string[];
+  /** Runtime configuration. */
+  config: ExecutorConfig;
+  /** Health check definition. */
+  healthCheck: HealthCheck;
+}
+
+/** Top-level executor registry file schema. */
+export interface ExecutorRegistry {
+  /** Schema version identifier. */
+  $schema: string;
+  /** Human-readable description. */
+  description: string;
+  /** List of registered executors. */
+  executors: ExecutorEntry[];
+}
+
+/** An executor entry with resolved absolute paths (runtime). */
+export interface ResolvedExecutor {
+  /** Unique identifier. */
+  id: string;
+  /** Human-readable display name. */
+  name: string;
+  /** Absolute path to the bridge script. */
+  bridge: string;
+  /** Runtime configuration. */
+  config: ExecutorConfig;
+  /** Health check definition. */
+  healthCheck: HealthCheck;
+}

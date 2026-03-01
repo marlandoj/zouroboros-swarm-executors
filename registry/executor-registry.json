@@ -1,0 +1,77 @@
+{
+  "$schema": "executor-registry/v1",
+  "description": "Local executor registry for zo-swarm-orchestrator",
+  "executors": [
+    {
+      "id": "claude-code",
+      "name": "Claude Code",
+      "executor": "local",
+      "bridge": "Skills/zo-swarm-executors/bridges/claude-code-bridge.sh",
+      "description": "Claude Code CLI in one-shot mode — full codebase context, file editing, terminal access",
+      "expertise": [
+        "code-generation",
+        "code-review",
+        "debugging",
+        "refactoring",
+        "architecture",
+        "testing",
+        "documentation"
+      ],
+      "best_for": [
+        "Complex multi-file code changes",
+        "Codebase-aware analysis requiring file reads",
+        "Tasks needing terminal command execution",
+        "Git operations and repository management"
+      ],
+      "config": {
+        "defaultTimeout": 600,
+        "model": null,
+        "envVars": {
+          "CLAUDE_CODE_BIN": "Path to claude binary (auto-detected if omitted)",
+          "CLAUDE_CODE_MODEL": "Override model selection",
+          "CLAUDE_CODE_TIMEOUT": "Timeout in seconds (default: 600)"
+        }
+      },
+      "healthCheck": {
+        "command": "command -v claude || test -x /root/.local/bin/claude",
+        "expectedPattern": "claude",
+        "description": "Verify Claude Code CLI is installed"
+      }
+    },
+    {
+      "id": "hermes",
+      "name": "Hermes Agent",
+      "executor": "local",
+      "bridge": "Skills/zo-swarm-executors/bridges/hermes-bridge.sh",
+      "description": "Hermes AI agent with tool-calling, web search, and multi-modal capabilities",
+      "expertise": [
+        "web-research",
+        "web-scraping",
+        "data-analysis",
+        "image-generation",
+        "multi-modal",
+        "tool-orchestration"
+      ],
+      "best_for": [
+        "Web research and content extraction",
+        "Tasks requiring external API tools",
+        "Image generation and analysis",
+        "Multi-step tool-calling workflows"
+      ],
+      "config": {
+        "defaultTimeout": 300,
+        "model": "anthropic/claude-sonnet-4",
+        "envVars": {
+          "HERMES_PROJECT_DIR": "Path to hermes-agent project (default: /home/workspace/hermes-agent)",
+          "HERMES_VENV": "Path to venv activate script (default: $HERMES_PROJECT_DIR/.venv/bin/activate)",
+          "OPENROUTER_API_KEY": "Required — LLM API access for Hermes"
+        }
+      },
+      "healthCheck": {
+        "command": "test -f /home/workspace/hermes-agent/cli.py && test -f /home/workspace/hermes-agent/.venv/bin/activate",
+        "expectedPattern": "",
+        "description": "Verify Hermes project and venv exist"
+      }
+    }
+  ]
+}
