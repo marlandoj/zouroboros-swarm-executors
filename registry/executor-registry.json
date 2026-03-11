@@ -25,7 +25,7 @@
       ],
       "config": {
         "defaultTimeout": 600,
-        "model": null,
+        "model": "swarm-failover",
         "envVars": {
           "CLAUDE_CODE_BIN": "Path to claude binary (auto-detected if omitted)",
           "CLAUDE_CODE_MODEL": "Override model selection",
@@ -68,7 +68,7 @@
       ],
       "config": {
         "defaultTimeout": 300,
-        "model": "anthropic/claude-sonnet-4",
+        "model": "swarm-failover",
         "envVars": {
           "HERMES_PROJECT_DIR": "Path to hermes-agent project (default: /home/workspace/hermes-agent)",
           "HERMES_VENV": "Path to venv activate script (default: $HERMES_PROJECT_DIR/.venv/bin/activate)",
@@ -163,8 +163,8 @@
         "Tasks that don't require web access or tools"
       ],
       "config": {
-        "defaultTimeout": 300,
-        "model": "gpt-5.4",
+        "defaultTimeout": 600,
+        "model": "swarm-failover",
         "envVars": {
           "CODEX_MODEL": "Override model (e.g., o3, gpt-4.1)",
           "CODEX_TIMEOUT": "Timeout in seconds (default: 300)"

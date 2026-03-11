@@ -21,7 +21,22 @@ TIMEOUT="${CLAUDE_CODE_TIMEOUT:-600}"
 
 # v4.7: Tiered model routing — orchestrator sets SWARM_RESOLVED_MODEL per task
 # Priority: SWARM_RESOLVED_MODEL > CLAUDE_CODE_MODEL > (empty = CLI default)
-CLAUDE_CODE_MODEL="${SWARM_RESOLVED_MODEL:-${CLAUDE_CODE_MODEL:-}}"
+# v4.8: Translate swarm tier names to Claude model names
+RAW_MODEL="${SWARM_RESOLVED_MODEL:-${CLAUDE_CODE_MODEL:-}}"
+
+# Map swarm tier names to Claude Code model aliases
+# swarm-light  → haiku (fast, cheap, good for simple tasks)
+# swarm-mid    → sonnet (balanced, default for most tasks)
+# swarm-heavy  → opus (most capable, for complex tasks)
+# swarm-failover → sonnet (fallback)
+case "$RAW_MODEL" in
+  swarm-light)    CLAUDE_CODE_MODEL="haiku" ;;
+  swarm-mid)      CLAUDE_CODE_MODEL="sonnet" ;;
+  swarm-heavy)    CLAUDE_CODE_MODEL="opus" ;;
+  swarm-failover) CLAUDE_CODE_MODEL="sonnet" ;;
+  swarm-*)        CLAUDE_CODE_MODEL="sonnet" ;;  # Unknown swarm tier → default to sonnet
+  *)              CLAUDE_CODE_MODEL="$RAW_MODEL" ;;  # Pass through other model names
+esac
 
 # Resolve claude binary — check PATH, then known install locations
 CLAUDE_BIN="${CLAUDE_CODE_BIN:-}"
