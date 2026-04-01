@@ -2,7 +2,7 @@
 
 > Turn any CLI tool into a first-class AI persona on [Zo Computer](https://zo.computer). Each executor gets consistent identity, shared memory, and full swarm integration through a simple bash bridge script.
 >
-> Part of the [Zouroboros](https://github.com/marlandoj) ecosystem — self-improving AI development tools for Zo Computer.
+> Part of the [Zouroboros](https://github.com/marlandoj/zouroboros) ecosystem — self-improving AI development tools for Zo Computer.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
