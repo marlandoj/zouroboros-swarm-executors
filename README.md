@@ -1,3 +1,7 @@
+> **⚠️ DEPRECATED** — This repository has been archived. All code has been migrated to the [Zouroboros monorepo](https://github.com/marlandoj/Zouroboros) under `packages/swarm/src/executor/`. Please open issues and PRs there.
+
+---
+
 # Zouroboros Swarm Executors
 
 > Turn any CLI tool into a first-class AI persona on [Zo Computer](https://zo.computer). Each executor gets consistent identity, shared memory, and full swarm integration through a simple bash bridge script.
