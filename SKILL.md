@@ -1,6 +1,6 @@
 ---
 name: zo-swarm-executors
-description: Local executor system for zo-swarm-orchestrator — manages bridge scripts, health checks, and registry for Claude Code, Hermes, Gemini, and Codex agents running on the local machine.
+description: Local executor system for zo-swarm-orchestrator — manages ACP and bridge transports, health checks, and registry metadata for Claude Code, Hermes, Gemini, Codex, OpenCode, Kimi, and Pi agents.
 version: 2.0.0
 author: marlandoj
 tags:
@@ -12,6 +12,9 @@ tags:
   - hermes
   - gemini
   - codex
+  - opencode
+  - kimi
+  - pi
 related_skills:
   - zo-swarm-orchestrator
   - zo-memory-system
@@ -41,12 +44,15 @@ bun scripts/register.ts validate
 
 ## Available Executors
 
-| ID | Name | Bridge | Speed | Best For |
+| ID | Name | Swarm transport | Speed | Best For |
 |----|------|--------|-------|----------|
 | `claude-code` | Claude Code | `bridges/claude-code-bridge.sh` | ~25-120s | Code implementation, file editing, git operations |
-| `hermes` | Hermes Agent | `bridges/hermes-bridge.sh` | ~15-60s | Web research, security audits, multi-tool investigation |
+| `hermes` | Hermes Agent | `hermes acp --accept-hooks` | ~15-60s | Web research, security audits, multi-tool investigation |
 | `gemini` | Gemini CLI | `bridges/gemini-bridge.sh` | ~2-12s (daemon) | Large-context analysis (1M+ tokens), multimodal tasks |
 | `codex` | Codex CLI | `bridges/codex-bridge.sh` | ~3s | Fast code generation, shell commands, rapid prototyping |
+| `opencode` | OpenCode CLI | `opencode acp --pure` | provider-dependent | Model-neutral code execution across task-scoped providers |
+| `kimi` | Kimi Code CLI | `kimi acp` | provider-dependent | Large-context coding, multimodal work, MCP-enabled sessions |
+| `pi` | Pi Coding Agent | `bridges/pi-bridge.sh` | provider-dependent | Minimal-harness coding and model comparisons |
 
 ## Bridge Protocol
 
@@ -88,10 +94,20 @@ Or let the orchestrator use its default path: `Skills/zo-swarm-executors/registr
 | `HERMES_PROJECT_DIR` | hermes | `/home/workspace/hermes-agent` |
 | `HERMES_VENV` | hermes | `$HERMES_PROJECT_DIR/.venv/bin/activate` |
 | `HERMES_TIMEOUT` | hermes | `300`s |
+| `HERMES_ACP_ENABLED` | hermes | `1`; set `0` for bridge rollback |
 | `GEMINI_MODEL` | gemini | `gemini-2.5-flash` |
 | `GEMINI_TIMEOUT` | gemini | `300`s |
 | `GEMINI_NO_DAEMON` | gemini | `0` (daemon enabled) |
 | `CODEX_MODEL` | codex | `gpt-5.4` |
 | `CODEX_TIMEOUT` | codex | `300`s |
+| `SWARM_OPENCODE_ENABLED` | opencode | `0`; set `1` for automatic swarm routing |
+| `SF_OPENCODE_ENABLED` | opencode | `0`; set `1` for the Software Factory chain |
+| `OPENROUTER_API_KEY` | kimi/pi | Required for the verified default Kimi K3 route |
+| `KIMI_MODEL_API_KEY` | kimi | Optional explicit provider key |
+| `KIMI_MODEL_BASE_URL` | kimi | Optional OpenAI-compatible provider base URL |
+| `KIMI_MODEL_NAME` | kimi | `moonshotai/kimi-k3` |
+| `KIMI_TIMEOUT` | kimi | `600`s |
+| `PI_MODEL` | pi | `openrouter/moonshotai/kimi-k3` |
+| `PI_TIMEOUT` | pi | `600`s |
 | `SWARM_WORKSPACE` | all | `/home/workspace` |
 | `SWARM_EXECUTOR_REGISTRY` | all | `Skills/zo-swarm-executors/registry/executor-registry.json` |

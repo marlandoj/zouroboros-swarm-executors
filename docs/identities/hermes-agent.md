@@ -64,7 +64,13 @@ Autonomous AI agent powered by Nous Research's Hermes CLI. Specializes in deep r
 
 ### Invocation from Swarm Orchestrator
 ```bash
-# One-shot task execution (via bridge script)
+# Native ACP server used by the swarm registry
+hermes acp --accept-hooks
+
+# Force the swarm factory onto the legacy bridge rollback
+export HERMES_ACP_ENABLED=0
+
+# Direct legacy bridge invocation
 Skills/zo-swarm-executors/bridges/hermes-bridge.sh "research prompt"
 
 # Direct CLI
