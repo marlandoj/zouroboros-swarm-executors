@@ -585,6 +585,79 @@
       }
     },
     {
+      "id": "cursor",
+      "name": "Cursor CLI",
+      "executor": "local",
+      "bridge": "Skills/zo-swarm-executors/bridges/cursor-bridge.sh",
+      "description": "Cursor Agent in isolated noninteractive print mode with repository rules, MCP support, JSON result extraction, and task-scoped model selection",
+      "expertise": [
+        "code-generation",
+        "code-review",
+        "debugging",
+        "refactoring",
+        "testing",
+        "shell-commands",
+        "file-editing",
+        "repository-rules",
+        "mcp"
+      ],
+      "best_for": [
+        "Repository-aware implementation",
+        "Cursor rules and AGENTS.md guided changes",
+        "Focused refactoring and debugging",
+        "MCP-enabled coding tasks",
+        "Approved noninteractive swarm mutations"
+      ],
+      "config": {
+        "defaultTimeout": 600,
+        "model": "auto",
+        "envVars": {
+          "CURSOR_AGENT_BIN": "Optional cursor-agent binary override",
+          "CURSOR_API_KEY": "Optional automation credential; browser login is also supported",
+          "CURSOR_MODEL": "Optional concrete Cursor model override (default: auto)",
+          "CURSOR_TIMEOUT": "Bridge timeout in seconds (default: 600)",
+          "CURSOR_FORCE": "Set to 0 to omit --force (default: 1)"
+        }
+      },
+      "healthCheck": {
+        "command": "command -v cursor-agent && cursor-agent --version",
+        "expectedPattern": "cursor-agent",
+        "description": "Verify Cursor Agent is installed; cursor-agent status separately verifies authentication"
+      },
+      "transport": "bridge",
+      "modelRouter": {
+        "defaultModel": "auto",
+        "fallbackModel": "auto",
+        "passthrough": true,
+        "rejectPrefixes": [
+          "byok:"
+        ],
+        "tierMap": {
+          "trivial": "auto",
+          "simple": "auto",
+          "moderate": "auto",
+          "complex": "auto",
+          "light": "auto",
+          "mid": "auto",
+          "heavy": "auto",
+          "failover": "auto",
+          "swarm-light": "auto",
+          "swarm-mid": "auto",
+          "swarm-heavy": "auto",
+          "swarm-failover": "auto"
+        }
+      },
+      "capabilities": {
+        "fileRead": true,
+        "fileWrite": true,
+        "shellExec": true,
+        "webResearch": false,
+        "imageGen": false,
+        "mcp": true,
+        "streaming": false
+      }
+    },
+    {
       "id": "mimir",
       "name": "Mimir Memory Sage",
       "executor": "local",

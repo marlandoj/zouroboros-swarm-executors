@@ -58,6 +58,7 @@ The executor system now has a transport abstraction layer. All executors impleme
 | opencode | **acp** | `opencode acp --pure` |
 | kimi | **acp** | `kimi acp` through `kimi-bridge.sh --acp` |
 | pi | **bridge** | `pi --print --no-session` |
+| cursor | **bridge** | `cursor-agent -p --force --output-format json` |
 
 Hermes v1 ACP routing is scoped to research, audit, investigation, security, summarization, and tool orchestration. Code-generation routing remains outside this canary boundary.
 
