@@ -28,6 +28,23 @@ export interface HealthCheck {
   description: string;
 }
 
+export interface ACPMcpConfig {
+  configPath?: string;
+  includeShared?: boolean;
+  includeZo?: boolean;
+  includeMemoryBriefing?: boolean;
+}
+
+export interface ExecutorCapabilities {
+  fileRead: boolean;
+  fileWrite: boolean;
+  shellExec: boolean;
+  webResearch: boolean;
+  imageGen: boolean;
+  mcp: boolean;
+  streaming: boolean;
+}
+
 /** A single executor entry in the registry. */
 export interface ExecutorEntry {
   /** Unique identifier (e.g. "claude-code", "hermes"). */
@@ -37,7 +54,7 @@ export interface ExecutorEntry {
   /** Executor type — "local" for bridge-based executors. */
   executor: "local";
   /** Path to the bridge script, relative to WORKSPACE root. */
-  bridge: string;
+  bridge?: string;
   /** Short description of the executor's capabilities. */
   description: string;
   /** Tags describing areas of expertise. */
@@ -48,6 +65,45 @@ export interface ExecutorEntry {
   config: ExecutorConfig;
   /** Health check definition. */
   healthCheck: HealthCheck;
+  /** Runtime transport implementation. */
+  transport?: "bridge" | "acp" | "mimir";
+  /** ACP adapter configuration when transport is acp. */
+  acp?: {
+    adapterBin?: string;
+    adapterArgs?: string[];
+    extraEnv?: Record<string, string>;
+    allowedTools?: string[];
+    mcpConfig?: ACPMcpConfig;
+    modelSelection?: {
+      method: "env" | "session-config" | "extension";
+      envVar?: string;
+      configId?: string;
+      category?: string;
+      extensionMethod?: string;
+      providerSeparator?: "/" | ":";
+    };
+    endpointClass?: string;
+    providerTemplates?: Record<string, {
+      endpointClass: string;
+      credentialEnv: string;
+      launchConfig?: {
+        envVar: string;
+        value: Record<string, unknown>;
+      };
+    }>;
+  };
+  /** Truthful runtime capabilities used by selector policy. */
+  capabilities?: ExecutorCapabilities;
+  /** Shared alias to executor-native model routing metadata. */
+  modelRouter?: {
+    defaultModel?: string;
+    fallbackModel?: string;
+    tierMap?: Record<string, string>;
+    acceptedPrefixes?: string[];
+    rejectPrefixes?: string[];
+    stripPrefixes?: string[];
+    passthrough?: boolean;
+  };
 }
 
 /** Top-level executor registry file schema. */
@@ -97,7 +153,7 @@ export interface ResolvedExecutor {
   /** Human-readable display name. */
   name: string;
   /** Absolute path to the bridge script. */
-  bridge: string;
+  bridge?: string;
   /** Runtime configuration. */
   config: ExecutorConfig;
   /** Health check definition. */

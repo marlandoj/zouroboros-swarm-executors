@@ -41,7 +41,9 @@ function cmdList(): void {
   for (const e of registry.executors) {
     console.log(`  ${e.id}`);
     console.log(`    Name:    ${e.name}`);
-    console.log(`    Bridge:  ${e.bridge}`);
+    console.log(`    Transport: ${e.transport ?? "bridge"}`);
+    if (e.bridge) console.log(`    Bridge:  ${e.bridge}`);
+    if (e.acp?.adapterBin) console.log(`    ACP:     ${e.acp.adapterBin}`);
     console.log(`    Timeout: ${e.config.defaultTimeout}s`);
     console.log(`    Tags:    ${e.expertise.join(", ")}`);
     console.log();
@@ -61,7 +63,12 @@ function cmdValidate(): void {
     if (ids.has(e.id)) errors.push(`Duplicate id: ${e.id}`);
     ids.add(e.id);
 
-    if (!e.bridge) errors.push(`${e.id}: missing bridge path`);
+    if ((e.transport ?? "bridge") === "bridge" && !e.bridge) {
+      errors.push(`${e.id}: bridge transport requires a bridge path`);
+    }
+    if (e.transport === "acp" && !e.acp?.adapterBin) {
+      errors.push(`${e.id}: ACP transport requires acp.adapterBin`);
+    }
     if (e.executor !== "local") errors.push(`${e.id}: executor must be "local"`);
     if (!e.config?.defaultTimeout) errors.push(`${e.id}: missing config.defaultTimeout`);
     if (!e.healthCheck?.command) errors.push(`${e.id}: missing healthCheck.command`);

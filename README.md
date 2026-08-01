@@ -16,11 +16,13 @@
 
 This skill manages the local executors that power the [zouroboros-swarm-orchestrator](https://github.com/marlandoj/zouroboros-swarm-orchestrator). Instead of routing every task through a remote API, the orchestrator can send work to CLI tools running on your machine:
 
-- **4 Built-in Executors** -- Claude Code, Hermes, Gemini, and Codex, each wrapped in a bridge script
+- **8 Built-in CLI Executors** -- Claude Code, Hermes, Gemini, Codex, OpenCode, Kimi, Pi, and Cursor, plus the Mimir memory transport
 - **Shared Identity** -- All executors read the same SOUL.md, IDENTITY files, and memory system as API personas
 - **Simple Interface** -- A bridge script accepts a prompt on stdin and returns text on stdout. That's the whole contract
 - **Health Checks** -- Doctor script validates all bridges, environment variables, and CLI tools
 - **Custom Executors** -- Add your own CLI tool as an executor with a template bridge script and a registry entry
+
+Hermes runs through native ACP by default using `hermes acp --accept-hooks`, which provides streamed output, tool events, cancellation, and session-local model selection. Set `HERMES_ACP_ENABLED=0` only for temporary bridge rollback. The v1 routing boundary keeps Hermes focused on research, audit, investigation, security, summarization, and tool orchestration rather than code generation.
 
 ### Available Executors
 
@@ -30,6 +32,10 @@ This skill manages the local executors that power the [zouroboros-swarm-orchestr
 | Hermes | `hermes` | ~15-60s | Web research, security audits, data gathering |
 | Gemini | `gemini` | ~2-12s (daemon) | Large-context analysis (1M+ tokens), multimodal tasks |
 | Codex | `codex` | ~3s | Fast code generation, shell commands, rapid prototyping |
+| OpenCode | `opencode` | ~10-120s | Vendor-neutral provider/model routing, repository-aware implementation |
+| Kimi | `kimi` | provider-dependent | Native ACP, large-context coding, multimodal tasks, MCP forwarding |
+| Pi | `pi` | provider-dependent | Minimal-harness coding, focused implementation, model comparisons |
+| Cursor | `cursor-agent` | provider-dependent | Cursor rules, repository-aware implementation, MCP-enabled coding |
 
 ---
 
@@ -53,7 +59,7 @@ You can also call individual executors:
 - *"Have Codex generate a rate-limiting middleware for Express.js"*
 - *"Ask Gemini to analyze this 500-page PDF"*
 
-Zo knows which bridge script to call and handles the invocation.
+Zo selects the registered ACP or bridge transport and handles the invocation.
 
 ### Option 2: Terminal (Direct Bridge Calls)
 
@@ -213,6 +219,13 @@ It's good at my-domain tasks.
 | `GEMINI_MODEL` | gemini | `gemini-2.5-flash` |
 | `GEMINI_NO_DAEMON` | gemini | `0` (daemon enabled) |
 | `CODEX_MODEL` | codex | `gpt-5.2-codex` |
+| `OPENROUTER_API_KEY` | kimi/pi | Required for the verified default Kimi K3 route |
+| `KIMI_MODEL_API_KEY` | kimi | Optional explicit provider key |
+| `KIMI_MODEL_BASE_URL` | kimi | Optional OpenAI-compatible provider base URL |
+| `KIMI_MODEL_NAME` | kimi | `moonshotai/kimi-k3` |
+| `KIMI_TIMEOUT` | kimi | `600s` |
+| `PI_MODEL` | pi | `openrouter/moonshotai/kimi-k3` |
+| `PI_TIMEOUT` | pi | `600s` |
 
 ---
 

@@ -129,6 +129,20 @@ for (const entry of executors) {
   const symbol = "⏳";
   process.stdout.write(`  ${symbol} ${entry.id} ... `);
 
+  if (!entry.bridge) {
+    const result: TestResult = {
+      executor: entry.id,
+      status: "skip",
+      elapsed_ms: 0,
+      stdout: "",
+      stderr: "native transport has no bridge",
+      exitCode: 0,
+    };
+    results.push(result);
+    console.log("skip (native transport)");
+    continue;
+  }
+
   const result = await testExecutor(entry.id, entry.bridge, timeoutSec);
   results.push(result);
 
