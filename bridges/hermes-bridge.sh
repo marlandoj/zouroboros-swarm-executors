@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Hermes bridge script — invokes Hermes CLI in single-query mode
-# Strips banner/chrome, returns only the response text
+# Hermes bridge script — invokes Hermes CLI in true one-shot mode
+# Returns only the final response text and fails if no final response is produced
 #
 # Usage:
 #   ./hermes-bridge.sh "Your prompt here"
@@ -9,6 +9,7 @@
 # Environment:
 #   HERMES_PROJECT_DIR — path to hermes-agent project (default: /home/workspace/hermes-agent)
 #   HERMES_VENV        — path to venv activate script (default: $HERMES_PROJECT_DIR/.venv/bin/activate)
+#   HERMES_BIN         — Hermes launcher (default: resolved from the activated venv)
 #   HERMES_TIMEOUT     — timeout in seconds (default: 300)
 
 set -euo pipefail
@@ -49,6 +50,12 @@ fi
 cd "$PROJECT_DIR"
 source "$VENV_ACTIVATE"
 
+HERMES_BIN="${HERMES_BIN:-$(command -v hermes || true)}"
+if [ -z "$HERMES_BIN" ] || [ ! -x "$HERMES_BIN" ]; then
+  echo "ERROR: Hermes launcher not found after activating: $VENV_ACTIVATE" >&2
+  exit 1
+fi
+
 normalize_provider() {
   case "$1" in
     synthetic-new|custom:synthetic-new) printf '%s' "kimi-coding" ;;
@@ -64,10 +71,6 @@ START_TIME=$(date +%s%N)
 
 STDERR_LOG="/tmp/hermes-bridge-stderr-$$.log"
 OUTPUT_FILE="/tmp/hermes-bridge-output-$$.txt"
-
-# Run Hermes in quiet single-query mode, strip banner chrome
-# v0.14.0 changed banner from ╭─ ⚕ Hermes to  ─  ⚕ Hermes
-RAW_OUTPUT="/tmp/hermes-bridge-raw-$$.txt"
 
 # Build provider fallback chain: primary → SWARM_FALLBACK_PROVIDERS
 FALLBACK_PROVIDERS="${SWARM_FALLBACK_PROVIDERS:-}"
@@ -115,15 +118,15 @@ for ATTEMPT_PROVIDER in "${PROVIDER_LIST[@]}"; do
   fi
 
   :> "$STDERR_LOG"
-  :> "$RAW_OUTPUT"
-  if timeout "$TIMEOUT" python cli.py "${PROVIDER_ARGS[@]}" -q "$PROMPT" > "$RAW_OUTPUT" 2>"$STDERR_LOG"; then
+  :> "$OUTPUT_FILE"
+  if timeout "$TIMEOUT" "$HERMES_BIN" "${PROVIDER_ARGS[@]}" -z "$PROMPT" > "$OUTPUT_FILE" 2>"$STDERR_LOG"; then
     EXIT_CODE=0
   else
     EXIT_CODE=$?
   fi
 
   # Check if output contains a retryable provider error
-  COMBINED_ERRORS="$(cat "$STDERR_LOG" 2>/dev/null; cat "$RAW_OUTPUT" 2>/dev/null || true)"
+  COMBINED_ERRORS="$(cat "$STDERR_LOG" 2>/dev/null; cat "$OUTPUT_FILE" 2>/dev/null || true)"
   if echo "$COMBINED_ERRORS" | grep -qiE "(API call failed|Unknown provider|authentication|unauthorized|invalid.*api.key|credit.*exhaust|insufficient.*quota|rate.?limit|Authentication fails)"; then
     echo "BRIDGE_WARN: Provider ${ATTEMPT_PROVIDER:-configured default} failed, trying next..." >&2
     EXIT_CODE=1
@@ -132,32 +135,6 @@ for ATTEMPT_PROVIDER in "${PROVIDER_LIST[@]}"; do
 
   break
 done
-
-python3 - "$RAW_OUTPUT" "$OUTPUT_FILE" <<'PY_EOF'
-import sys, unicodedata
-raw_path, out_path = sys.argv[1], sys.argv[2]
-in_block = False
-lines = []
-with open(raw_path, encoding="utf-8", errors="replace") as f:
-    for line in f:
-        line = line.rstrip("\r\n")
-        if "⚕ Hermes" in line:
-            in_block = True
-            continue
-        if not in_block:
-            continue
-        if any(k in line for k in ("Resume this session", "Session:", "Duration:", "Messages:")):
-            break
-        stripped = line.strip()
-        # Skip box-drawing separator lines (lines made of ─ U+2500)
-        if stripped and all(unicodedata.category(c) in ("Po", "Pd", "Sm", "So", "Ps", "Pe") or c == "─" or c == "━" or c.strip() == "" for c in stripped):
-            continue
-        if stripped:
-            lines.append(stripped)
-with open(out_path, "w") as f:
-    f.write("\n".join(lines) + ("\n" if lines else ""))
-PY_EOF
-rm -f "$RAW_OUTPUT"
 
 # Helper: write failure result.json
 _write_failure_result() {
@@ -195,27 +172,18 @@ RESULT_EOF
   mv "$_RESULT_TMP" "$_RESULT_FILE"
 }
 
-if [ $EXIT_CODE -ne 0 ]; then
+if [ "$EXIT_CODE" -ne 0 ]; then
   echo "BRIDGE_ERROR: exit=$EXIT_CODE tier=${TIER:-unknown} timeout=${TIMEOUT}s model=${LLM_MODEL:-default} stderr=$(head -5 "$STDERR_LOG" 2>/dev/null)" >&2
   _write_failure_result "$EXIT_CODE" "$(head -5 "$STDERR_LOG" 2>/dev/null)"
   rm -f "$STDERR_LOG" "$OUTPUT_FILE"
   exit $EXIT_CODE
 fi
 
-# Safety check: if sed pipeline stripped everything, fall back to raw output
 if [ ! -s "$OUTPUT_FILE" ]; then
-  echo "BRIDGE_WARN: banner parsing returned empty output, retrying with raw capture" >&2
-  if timeout "$TIMEOUT" python cli.py "${PROVIDER_ARGS[@]}" -q "$PROMPT" 2>/dev/null > "$OUTPUT_FILE"; then
-    EXIT_CODE=0
-  else
-    EXIT_CODE=$?
-  fi
-  if [ $EXIT_CODE -ne 0 ]; then
-    echo "BRIDGE_ERROR: raw retry failed, exit=$EXIT_CODE tier=${TIER:-unknown} timeout=${TIMEOUT}s model=${LLM_MODEL:-default}" >&2
-    _write_failure_result "$EXIT_CODE" "raw retry failed, exit=$EXIT_CODE"
-    rm -f "$STDERR_LOG" "$OUTPUT_FILE"
-    exit $EXIT_CODE
-  fi
+  echo "BRIDGE_ERROR: Hermes exited successfully without a final response" >&2
+  _write_failure_result 1 "Hermes exited successfully without a final response"
+  rm -f "$STDERR_LOG" "$OUTPUT_FILE"
+  exit 1
 fi
 
 cat "$OUTPUT_FILE"
