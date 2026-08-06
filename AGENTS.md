@@ -31,7 +31,7 @@ docs/             — Protocol spec and reference identity files
 
 ## Known Limitations
 
-- The Hermes banner-parsing bridge is retained only for `HERMES_ACP_ENABLED=0` rollback and direct legacy use.
+- The Hermes one-shot bridge is retained only for `HERMES_ACP_ENABLED=0` rollback and direct scripted use. It must use `hermes -z`, which auto-bypasses interactive approvals, emits only the final response, and exits non-zero when no final response is produced.
 - Claude Code bridge discovers MCP tool names dynamically by querying each server's `tools/list` endpoint at startup. Results are cached for 1 hour at `/tmp/claude-bridge-mcp-tools-cache.txt`. Delete the cache to force re-discovery. Only HTTP/Streamable-HTTP MCP servers with a `url` in `.mcp.json` are queried (stdio servers are skipped).
 - ACP OpenCode sessions load the workspace `.mcp.json`, add an authenticated Zo MCP server, and inject the memory-gate session briefing per task. The registry is the source of truth for this task-scoped wiring; do not rely on global OpenCode MCP state.
 - No Windows support — bridges are bash scripts.
