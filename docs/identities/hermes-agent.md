@@ -59,7 +59,7 @@ Autonomous AI agent powered by Nous Research's Hermes CLI. Specializes in deep r
 - **Tool-rich** — 28+ tools including terminal, browser, file ops, vision, delegation
 - **Multi-model** — configurable LLM backend via OpenRouter (200+ models)
 - **Persistent** — SQLite FTS5 session storage, resumable conversations
-- **One-shot mode** — `hermes chat -q "prompt"` for scripted invocation
+- **One-shot mode** — `hermes -z "prompt"` for scripted invocation; do not use interactive `chat -q` from a headless caller
 - **Interactive mode** — full PTY session with multi-turn collaboration
 
 ### Invocation from Swarm Orchestrator
@@ -74,7 +74,7 @@ export HERMES_ACP_ENABLED=0
 Skills/zo-swarm-executors/bridges/hermes-bridge.sh "research prompt"
 
 # Direct CLI
-hermes chat -q "research prompt"
+hermes -z "research prompt"
 
 # Interactive session
 hermes
