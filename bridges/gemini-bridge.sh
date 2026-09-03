@@ -14,6 +14,10 @@
 
 set -euo pipefail
 
+# Headless spawns are non-interactive: trust the workspace so the CLI
+# does not refuse to run without an interactive trust prompt.
+export GEMINI_CLI_TRUST_WORKSPACE="${GEMINI_CLI_TRUST_WORKSPACE:-true}"
+
 PROMPT="${1:?Usage: gemini-bridge.sh \"prompt\" [workdir]}"
 WORKDIR="${2:-/home/workspace}"
 DEFAULT_MODEL="gemini-2.5-flash"
