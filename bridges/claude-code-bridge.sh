@@ -107,7 +107,7 @@ unset CLAUDE_CODE_ENTRYPOINT
 unset CLAUDE_SESSION_ID
 
 # Pre-approve built-in tools
-ALLOWED_TOOLS="Write Edit Bash Read Glob Grep NotebookEdit"
+ALLOWED_TOOLS="Write Edit Bash Read Glob Grep NotebookEdit WebFetch WebSearch"
 
 # Dynamically discover MCP tool names from .mcp.json servers.
 MCP_CONFIG="$WORKDIR/.mcp.json"
