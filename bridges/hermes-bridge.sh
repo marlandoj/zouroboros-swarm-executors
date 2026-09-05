@@ -99,6 +99,15 @@ for ATTEMPT_PROVIDER in "${PROVIDER_LIST[@]}"; do
     case "$ATTEMPT_PROVIDER" in
       xai)                   RESOLVED_MODEL="grok-3" ;;
       kimi-coding)           RESOLVED_MODEL="kimi-k3" ;;
+      anthropic|"")
+        # Anthropic provider: translate swarm tier labels to real model IDs.
+        case "$RESOLVED_MODEL" in
+          swarm-light|light|trivial|simple)   RESOLVED_MODEL="claude-haiku-4-5-20251001" ;;
+          swarm-mid|mid|moderate)             RESOLVED_MODEL="claude-opus-5" ;;
+          swarm-heavy|heavy|complex)          RESOLVED_MODEL="claude-fable-5-1" ;;
+          swarm-failover|failover)            RESOLVED_MODEL="claude-haiku-4-5-20251001" ;;
+        esac
+        ;;
       deepseek)
         # deepseek-chat/deepseek-reasoner retired 2026-07-24; V4 API only serves
         # deepseek-v4-flash / deepseek-v4-pro. Pick by tier: pro for heavier work.
