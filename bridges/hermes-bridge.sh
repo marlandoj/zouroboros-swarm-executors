@@ -7,7 +7,7 @@
 #   ./hermes-bridge.sh "Your prompt here" /path/to/workdir
 #
 # Environment:
-#   HERMES_PROJECT_DIR — path to hermes-agent project (default: /home/workspace/hermes-agent)
+#   HERMES_PROJECT_DIR — path to hermes-agent project (default: /home/zouroboros/hermes-agent)
 #   HERMES_VENV        — path to venv activate script (default: $HERMES_PROJECT_DIR/.venv/bin/activate)
 #   HERMES_BIN         — Hermes launcher (default: resolved from the activated venv)
 #   HERMES_TIMEOUT     — timeout in seconds (default: 300)
@@ -15,8 +15,8 @@
 set -euo pipefail
 
 PROMPT="${1:?Usage: hermes-bridge.sh \"prompt\" [workdir]}"
-WORKDIR="${2:-/home/workspace}"
-PROJECT_DIR="${HERMES_PROJECT_DIR:-/home/workspace/hermes-agent}"
+WORKDIR="${2:-/home/zouroboros}"
+PROJECT_DIR="${HERMES_PROJECT_DIR:-/home/zouroboros/hermes-agent}"
 VENV_ACTIVATE="${HERMES_VENV:-$PROJECT_DIR/.venv/bin/activate}"
 
 # Priority: SWARM_RESOLVED_MODEL > LLM_MODEL
