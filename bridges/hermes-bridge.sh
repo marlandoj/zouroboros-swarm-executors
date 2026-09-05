@@ -107,6 +107,11 @@ for ATTEMPT_PROVIDER in "${PROVIDER_LIST[@]}"; do
           swarm-heavy|heavy|complex)          RESOLVED_MODEL="claude-fable-5-1" ;;
           swarm-failover|failover)            RESOLVED_MODEL="claude-haiku-4-5-20251001" ;;
         esac
+        # Anthropic models are served ONLY by the anthropic subscription provider
+        # (cost policy) -- never let hermes re-route them (e.g. opencode-zen).
+        case "$RESOLVED_MODEL" in
+          claude-*) [ -n "$ATTEMPT_PROVIDER" ] || PROVIDER_ARGS+=(--provider anthropic) ;;
+        esac
         ;;
       deepseek)
         # deepseek-chat/deepseek-reasoner retired 2026-07-24; V4 API only serves
@@ -136,7 +141,7 @@ for ATTEMPT_PROVIDER in "${PROVIDER_LIST[@]}"; do
 
   # Check if output contains a retryable provider error
   COMBINED_ERRORS="$(cat "$STDERR_LOG" 2>/dev/null; cat "$OUTPUT_FILE" 2>/dev/null || true)"
-  if echo "$COMBINED_ERRORS" | grep -qiE "(API call failed|Unknown provider|authentication|unauthorized|invalid.*api.key|credit.*exhaust|insufficient.*quota|rate.?limit|Authentication fails)"; then
+  if echo "$COMBINED_ERRORS" | grep -qiE "(API call failed|Unknown provider|authentication|unauthorized|invalid.*api.key|credit.*exhaust|insufficient.*quota|rate.?limit|Authentication fails|No usable credentials)"; then
     echo "BRIDGE_WARN: Provider ${ATTEMPT_PROVIDER:-configured default} failed, trying next..." >&2
     EXIT_CODE=1
     continue
