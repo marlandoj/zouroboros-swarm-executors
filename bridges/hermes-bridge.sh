@@ -50,6 +50,14 @@ fi
 cd "$PROJECT_DIR"
 source "$VENV_ACTIVATE"
 
+# Load shared secrets (OPENAI_API_KEY, QDRANT_URL, QDRANT_API_KEY, ...) so MCP
+# servers spawned by hermes inherit them. File is 0640 root:zouroboros; never printed.
+if [ -r /etc/zouroboros/zouroboros.env ]; then
+  set -a
+  . /etc/zouroboros/zouroboros.env
+  set +a
+fi
+
 HERMES_BIN="${HERMES_BIN:-$(command -v hermes || true)}"
 if [ -z "$HERMES_BIN" ] || [ ! -x "$HERMES_BIN" ]; then
   echo "ERROR: Hermes launcher not found after activating: $VENV_ACTIVATE" >&2
