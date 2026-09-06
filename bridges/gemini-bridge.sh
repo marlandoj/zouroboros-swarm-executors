@@ -20,7 +20,7 @@ export GEMINI_CLI_TRUST_WORKSPACE="${GEMINI_CLI_TRUST_WORKSPACE:-true}"
 
 PROMPT="${1:?Usage: gemini-bridge.sh \"prompt\" [workdir]}"
 WORKDIR="${2:-/home/workspace}"
-DEFAULT_MODEL="gemini-2.5-flash"
+DEFAULT_MODEL="gemini-3.5-flash-lite"
 
 # Priority: SWARM_RESOLVED_MODEL > GEMINI_MODEL > default
 _SWARM_MODEL="${SWARM_RESOLVED_MODEL:-}"
@@ -41,29 +41,30 @@ fi
 
 # Resolve model: accept only Gemini-native names (gemini-* or gc/*).
 # Map swarm tier names to Gemini model aliases
-# swarm-light    → gemini-2.5-flash   (fast, cheap)
-# swarm-mid      → gemini-2.5-pro     (balanced)
-# swarm-heavy    → gemini-2.5-pro     (frontier — no separate Gemini "opus" tier)
-# swarm-failover → gemini-2.5-flash
+# Operator lineup 2026-09-06 (slugs verified live on operator key):
+# swarm-light    → gemini-3.5-flash-lite   (fast, cheap)
+# swarm-mid      → gemini-3.8-flash        (GA workhorse, agent-tuned)
+# swarm-heavy    → gemini-3.8-flash        (GA only — no preview IDs in swarm config)
+# swarm-failover → gemini-3.5-flash-lite
 
 case "$_SWARM_MODEL" in
-  swarm-light)    MODEL="gemini-2.5-flash" ;;
-  swarm-mid)      MODEL="gemini-2.5-pro" ;;
-  swarm-heavy)    MODEL="gemini-2.5-pro" ;;
-  swarm-failover) MODEL="gemini-2.5-flash" ;;
-  swarm-*)        MODEL="gemini-2.5-flash" ;;
-  light)          MODEL="gemini-2.5-flash" ;;
-  mid)            MODEL="gemini-2.5-pro" ;;
-  heavy)          MODEL="gemini-2.5-pro" ;;
-  failover)       MODEL="gemini-2.5-flash" ;;
+  swarm-light)    MODEL="gemini-3.5-flash-lite" ;;
+  swarm-mid)      MODEL="gemini-3.8-flash" ;;
+  swarm-heavy)    MODEL="gemini-3.8-flash" ;;
+  swarm-failover) MODEL="gemini-3.5-flash-lite" ;;
+  swarm-*)        MODEL="gemini-3.5-flash-lite" ;;
+  light)          MODEL="gemini-3.5-flash-lite" ;;
+  mid)            MODEL="gemini-3.8-flash" ;;
+  heavy)          MODEL="gemini-3.8-flash" ;;
+  failover)       MODEL="gemini-3.5-flash-lite" ;;
   gemini*|gc/*|models/*) MODEL="${_SWARM_MODEL#gc/}" ;;
   "")
     case "$_GEMINI_MODEL" in
-      swarm-light)    MODEL="gemini-2.5-flash" ;;
-      swarm-mid)      MODEL="gemini-2.5-pro" ;;
-      swarm-heavy)    MODEL="gemini-2.5-pro" ;;
-      swarm-failover) MODEL="gemini-2.5-flash" ;;
-      swarm-*)        MODEL="gemini-2.5-flash" ;;
+      swarm-light)    MODEL="gemini-3.5-flash-lite" ;;
+      swarm-mid)      MODEL="gemini-3.8-flash" ;;
+      swarm-heavy)    MODEL="gemini-3.8-flash" ;;
+      swarm-failover) MODEL="gemini-3.5-flash-lite" ;;
+      swarm-*)        MODEL="gemini-3.5-flash-lite" ;;
       gemini*|gc/*|models/*) MODEL="${_GEMINI_MODEL#gc/}" ;;
       "")             MODEL="$DEFAULT_MODEL" ;;
       *)
