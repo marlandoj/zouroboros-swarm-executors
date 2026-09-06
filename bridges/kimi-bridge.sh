@@ -18,6 +18,14 @@ fi
 export KIMI_MODEL_NAME="${KIMI_MODEL_NAME:-moonshotai/kimi-k3}"
 export KIMI_DISABLE_TELEMETRY="${KIMI_DISABLE_TELEMETRY:-1}"
 
+# Load shared secrets (OPENAI_API_KEY, QDRANT_URL, QDRANT_API_KEY, ...) so MCP
+# servers spawned by kimi inherit them. File is 0640 root:zouroboros; never printed.
+if [ -r /etc/zouroboros/zouroboros.env ]; then
+  set -a
+  . /etc/zouroboros/zouroboros.env
+  set +a
+fi
+
 if [[ "${1:-}" == "--acp" ]]; then
   exec kimi acp
 fi
