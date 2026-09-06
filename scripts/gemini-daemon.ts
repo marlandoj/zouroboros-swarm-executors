@@ -118,7 +118,7 @@ if (args.includes("--status")) {
   let pid = 0;
   if (pidExists) {
     pid = parseInt(readFileSync(PID_FILE, "utf-8").trim());
-    try { process.kill(pid, 0); running = true; }
+    try { process.kill(pid, 0); running = true; } catch {}
   }
   console.log("Gemini Daemon Status:");
   console.log(`  Socket: ${socketExists ? "exists" : "missing"} (${SOCKET_PATH})`);
