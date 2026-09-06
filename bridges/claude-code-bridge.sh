@@ -27,7 +27,7 @@ TIER="${SWARM_TIER:-}"
 
 # Attempt dynamic resolution via tier-resolve.ts — only when no model was passed in,
 # so explicit SWARM_RESOLVED_MODEL / CLAUDE_CODE_MODEL always win (documented priority)
-TIER_RESOLVE_SCRIPT="/home/workspace/Skills/zo-swarm-orchestrator/scripts/tier-resolve.ts"
+TIER_RESOLVE_SCRIPT="/opt/zouroboros/repo/Skills/zo-swarm-orchestrator/scripts/tier-resolve.ts"
 if [ -z "$RAW_MODEL" ] && [ -f "$TIER_RESOLVE_SCRIPT" ] && command -v bun &>/dev/null; then
   RESOLVED_JSON=$(timeout 15 bun "$TIER_RESOLVE_SCRIPT" "$PROMPT" --json 2>/dev/null) || true
   if [ -n "${RESOLVED_JSON:-}" ]; then
@@ -45,21 +45,21 @@ fi
 
 # Static fallback: map swarm tier names to Claude Code model aliases
 # swarm-light    → claude-haiku-4-5   (fast, cheap)
-# swarm-mid      → claude-sonnet-4-6  (balanced)
-# swarm-heavy    → claude-sonnet-4-6  (ZOU-397: Opus reserved for explicit override)
+# swarm-mid      → claude-opus-5  (balanced)
+# swarm-heavy    → claude-fable-5-1  (frontier; operator policy 2026-09 supersedes ZOU-397)
 # swarm-failover → claude-haiku-4-5
 case "$RAW_MODEL" in
   swarm-light)    CLAUDE_CODE_MODEL="claude-haiku-4-5-20251001" ;;
-  swarm-mid)      CLAUDE_CODE_MODEL="claude-sonnet-4-6" ;;
-  swarm-heavy)    CLAUDE_CODE_MODEL="claude-sonnet-4-6" ;;
+  swarm-mid)      CLAUDE_CODE_MODEL="claude-opus-5" ;;
+  swarm-heavy)    CLAUDE_CODE_MODEL="claude-fable-5-1" ;;
   swarm-failover) CLAUDE_CODE_MODEL="claude-haiku-4-5-20251001" ;;
   swarm-*)        CLAUDE_CODE_MODEL="claude-haiku-4-5-20251001" ;;
   light)          CLAUDE_CODE_MODEL="claude-haiku-4-5-20251001" ;;
-  mid)            CLAUDE_CODE_MODEL="claude-sonnet-4-6" ;;
-  heavy)          CLAUDE_CODE_MODEL="claude-sonnet-4-6" ;;
+  mid)            CLAUDE_CODE_MODEL="claude-opus-5" ;;
+  heavy)          CLAUDE_CODE_MODEL="claude-fable-5-1" ;;
   failover)       CLAUDE_CODE_MODEL="claude-haiku-4-5-20251001" ;;
-  "")             CLAUDE_CODE_MODEL="claude-sonnet-4-6"
-                  echo "[claude-code-bridge] no model resolved — defaulting to claude-sonnet-4-6 (ZOU-397, was: CLI default)" >&2 ;;
+  "")             CLAUDE_CODE_MODEL="claude-opus-5"
+                  echo "[claude-code-bridge] no model resolved — defaulting to claude-opus-5 (operator policy 2026-09, was: CLI default)" >&2 ;;
   *)              CLAUDE_CODE_MODEL="$RAW_MODEL" ;;
 esac
 
