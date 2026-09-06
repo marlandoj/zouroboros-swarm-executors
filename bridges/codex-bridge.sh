@@ -15,6 +15,19 @@ set -euo pipefail
 PROMPT="${1:?Usage: codex-bridge.sh \"prompt\" [workdir]}"
 WORKDIR="${2:-/home/workspace}"
 
+# Pin codex to the operator profile: campaign sessions run with HOME=/opt/zouroboros/repo,
+# which has no auth.json (401 exit-1, item 5); codex honors CODEX_HOME ahead of $HOME/.codex.
+export CODEX_HOME="${CODEX_HOME:-/home/zouroboros/.codex}"
+
+# Load shared secrets (OPENAI_API_KEY, QDRANT_URL, QDRANT_API_KEY, ...) so MCP
+# servers spawned by codex inherit them. File is 0640 root:zouroboros; never printed.
+if [ -r /etc/zouroboros/zouroboros.env ]; then
+  set -a
+  . /etc/zouroboros/zouroboros.env
+  set +a
+fi
+
+
 # Load secrets for MCP servers
 if [ -f "$HOME/.zo_secrets" ]; then
   source "$HOME/.zo_secrets"
@@ -37,20 +50,20 @@ else
 fi
 
 # Static fallback: map swarm tier names to Codex model aliases
-# swarm-light    → gpt-5.1-codex-mini (fast, cheap)
-# swarm-mid      → gpt-5.3-codex     (balanced)
-# swarm-heavy    → gpt-5.4           (frontier)
-# swarm-failover → gpt-5.1-codex-mini
+# swarm-light    → gpt-5.6-luna (fast, cheap)
+# swarm-mid      → gpt-5.6-terra     (balanced)
+# swarm-heavy    → gpt-6-astra           (frontier)
+# swarm-failover → gpt-5.6-luna
 case "$RAW_MODEL" in
-  swarm-light)    CODEX_MODEL="gpt-5.1-codex-mini" ;;
-  swarm-mid)      CODEX_MODEL="gpt-5.3-codex" ;;
-  swarm-heavy)    CODEX_MODEL="gpt-5.4" ;;
-  swarm-failover) CODEX_MODEL="gpt-5.1-codex-mini" ;;
-  swarm-*)        CODEX_MODEL="gpt-5.1-codex-mini" ;;
-  light)          CODEX_MODEL="gpt-5.1-codex-mini" ;;
-  mid)            CODEX_MODEL="gpt-5.3-codex" ;;
-  heavy)          CODEX_MODEL="gpt-5.4" ;;
-  failover)       CODEX_MODEL="gpt-5.1-codex-mini" ;;
+  swarm-light)    CODEX_MODEL="gpt-5.6-luna" ;;
+  swarm-mid)      CODEX_MODEL="gpt-5.6-terra" ;;
+  swarm-heavy)    CODEX_MODEL="gpt-6-astra" ;;
+  swarm-failover) CODEX_MODEL="gpt-5.6-luna" ;;
+  swarm-*)        CODEX_MODEL="gpt-5.6-luna" ;;
+  light)          CODEX_MODEL="gpt-5.6-luna" ;;
+  mid)            CODEX_MODEL="gpt-5.6-terra" ;;
+  heavy)          CODEX_MODEL="gpt-6-astra" ;;
+  failover)       CODEX_MODEL="gpt-5.6-luna" ;;
   *)              CODEX_MODEL="$RAW_MODEL" ;;
 esac
 
