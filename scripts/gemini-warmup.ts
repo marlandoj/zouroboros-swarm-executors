@@ -97,7 +97,10 @@ async function startDaemon(): Promise<boolean> {
 }
 
 async function stopDaemon(): Promise<void> {
-  if (!existsSync(DAEMON_PID_FILE)) return;
+  if (!existsSync(DAEMON_PID_FILE)) {
+    console.log("No daemon running");
+    return;
+  }
   const pid = parseInt(await Bun.file(DAEMON_PID_FILE).text(), 10);
   try { process.kill(pid, "SIGTERM"); } catch {}
   try { if (existsSync(DAEMON_SOCKET)) Bun.spawnSync({ cmd: ["rm", "-f", DAEMON_SOCKET] }); } catch {}
@@ -109,7 +112,7 @@ function findGeminiBinary(): string | null {
   const paths = ["/usr/bin/gemini", "/usr/local/bin/gemini", `${process.env.HOME}/.local/bin/gemini`];
   for (const p of paths) { if (existsSync(p)) return p; }
   const result = Bun.spawnSync({ cmd: ["which", "gemini"], stdout: "pipe", stderr: "pipe" });
-  if (result.success && result.stdout) return result.stdout.toString().trim() : null;
+  if (result.success && result.stdout) return result.stdout.toString().trim();
   return null;
 }
 
