@@ -21,7 +21,7 @@ import { existsSync, unlinkSync, writeFileSync, readFileSync } from "fs";
 const SOCKET_PATH = "/tmp/gemini-daemon.sock";
 const PID_FILE = "/tmp/gemini-daemon.pid";
 const LOG_FILE = "/dev/shm/gemini-daemon.log";
-const DEFAULT_MODEL = "gemini-2.5-flash";
+const DEFAULT_MODEL = "gemini-3.5-flash-lite";
 const MAX_CONCURRENT = 4;
 const IDLE_TIMEOUT_MS = 30 * 60 * 1000;
 
@@ -118,7 +118,7 @@ if (args.includes("--status")) {
   let pid = 0;
   if (pidExists) {
     pid = parseInt(readFileSync(PID_FILE, "utf-8").trim());
-    try { process.kill(pid, 0); running = true; } catch {}
+    try { process.kill(pid, 0); running = true; }
   }
   console.log("Gemini Daemon Status:");
   console.log(`  Socket: ${socketExists ? "exists" : "missing"} (${SOCKET_PATH})`);
