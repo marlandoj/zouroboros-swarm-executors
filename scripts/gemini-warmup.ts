@@ -19,7 +19,7 @@ const DAEMON_SOCKET = "/tmp/gemini-daemon.sock";
 const DAEMON_PID_FILE = "/tmp/gemini-daemon.pid";
 const DAEMON_SCRIPT = new URL("./gemini-daemon.ts", import.meta.url).pathname;
 const PING_TIMEOUT_MS = 20000;
-const DEFAULT_MODEL = "gemini-2.5-flash";
+const DEFAULT_MODEL = "gemini-3.5-flash-lite";
 
 interface WarmupOptions {
   daemon?: boolean;
@@ -97,10 +97,7 @@ async function startDaemon(): Promise<boolean> {
 }
 
 async function stopDaemon(): Promise<void> {
-  if (!existsSync(DAEMON_PID_FILE)) {
-    console.log("No daemon running");
-    return;
-  }
+  if (!existsSync(DAEMON_PID_FILE)) return;
   const pid = parseInt(await Bun.file(DAEMON_PID_FILE).text(), 10);
   try { process.kill(pid, "SIGTERM"); } catch {}
   try { if (existsSync(DAEMON_SOCKET)) Bun.spawnSync({ cmd: ["rm", "-f", DAEMON_SOCKET] }); } catch {}
@@ -112,7 +109,7 @@ function findGeminiBinary(): string | null {
   const paths = ["/usr/bin/gemini", "/usr/local/bin/gemini", `${process.env.HOME}/.local/bin/gemini`];
   for (const p of paths) { if (existsSync(p)) return p; }
   const result = Bun.spawnSync({ cmd: ["which", "gemini"], stdout: "pipe", stderr: "pipe" });
-  if (result.success && result.stdout) return result.stdout.toString().trim();
+  if (result.success && result.stdout) return result.stdout.toString().trim() : null;
   return null;
 }
 
