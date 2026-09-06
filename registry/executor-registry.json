@@ -7,7 +7,7 @@
       "name": "Claude Code",
       "executor": "local",
       "bridge": "Skills/zo-swarm-executors/bridges/claude-code-bridge.sh",
-      "description": "Claude Code CLI in one-shot mode \u2014 full codebase context, file editing, terminal access",
+      "description": "Claude Code CLI in one-shot mode — full codebase context, file editing, terminal access",
       "expertise": [
         "code-generation",
         "code-review",
@@ -46,7 +46,7 @@
         }
       },
       "modelRouter": {
-        "defaultModel": "claude-sonnet-4-6",
+        "defaultModel": "claude-opus-5",
         "fallbackModel": "claude-haiku-4-5-20251001",
         "acceptedPrefixes": [
           "claude"
@@ -57,15 +57,15 @@
         "tierMap": {
           "trivial": "claude-haiku-4-5-20251001",
           "simple": "claude-haiku-4-5-20251001",
-          "moderate": "claude-sonnet-4-6",
-          "complex": "claude-opus-4-6",
+          "moderate": "claude-opus-5",
+          "complex": "claude-fable-5-1",
           "light": "claude-haiku-4-5-20251001",
-          "mid": "claude-sonnet-4-6",
-          "heavy": "claude-opus-4-6",
+          "mid": "claude-opus-5",
+          "heavy": "claude-fable-5-1",
           "failover": "claude-haiku-4-5-20251001",
           "swarm-light": "claude-haiku-4-5-20251001",
-          "swarm-mid": "claude-sonnet-4-6",
-          "swarm-heavy": "claude-opus-4-6",
+          "swarm-mid": "claude-opus-5",
+          "swarm-heavy": "claude-fable-5-1",
           "swarm-failover": "claude-haiku-4-5-20251001"
         }
       }
@@ -160,7 +160,7 @@
       "name": "Gemini CLI",
       "executor": "local",
       "bridge": "Skills/zo-swarm-executors/bridges/gemini-bridge.sh",
-      "description": "Google Gemini CLI with persistent daemon \u2014 large-context reasoning, multimodal analysis, code generation. Daemon eliminates ~10s Node.js startup overhead per call.",
+      "description": "Google Gemini CLI with persistent daemon — large-context reasoning, multimodal analysis, code generation. Daemon eliminates ~10s Node.js startup overhead per call.",
       "expertise": [
         "code-generation",
         "code-review",
@@ -186,9 +186,9 @@
       ],
       "config": {
         "defaultTimeout": 300,
-        "model": "gemini-2.5-flash",
+        "model": "gemini-3.5-flash-lite",
         "envVars": {
-          "GEMINI_MODEL": "Override model (e.g., gemini-2.5-pro for complex tasks)",
+          "GEMINI_MODEL": "Override model (e.g., gemini-3.8-flash for complex tasks)",
           "GEMINI_TIMEOUT": "Timeout in seconds (default: 300)",
           "GEMINI_NO_DAEMON": "Set to '1' to skip daemon and use direct CLI"
         }
@@ -205,7 +205,7 @@
       "warmUp": {
         "script": "Skills/zo-swarm-executors/scripts/gemini-warmup.ts",
         "hook": "Skills/zo-swarm-executors/scripts/pre-swarm-hook.sh",
-        "recommended": "Run before swarm execution \u2014 starts daemon automatically (~12s \u2192 ~2s per call)"
+        "recommended": "Run before swarm execution — starts daemon automatically (~12s → ~2s per call)"
       },
       "healthCheck": {
         "command": "command -v gemini",
@@ -224,8 +224,8 @@
         }
       },
       "modelRouter": {
-        "defaultModel": "gemini-2.5-flash",
-        "fallbackModel": "gemini-2.5-flash",
+        "defaultModel": "gemini-3.5-flash-lite",
+        "fallbackModel": "gemini-3.5-flash-lite",
         "acceptedPrefixes": [
           "gemini",
           "models/"
@@ -234,18 +234,18 @@
           "gc/"
         ],
         "tierMap": {
-          "trivial": "gemini-2.5-flash",
-          "simple": "gemini-2.5-flash",
-          "moderate": "gemini-2.5-pro",
-          "complex": "gemini-2.5-pro",
-          "light": "gemini-2.5-flash",
-          "mid": "gemini-2.5-pro",
-          "heavy": "gemini-2.5-pro",
-          "failover": "gemini-2.5-flash",
-          "swarm-light": "gemini-2.5-flash",
-          "swarm-mid": "gemini-2.5-pro",
-          "swarm-heavy": "gemini-2.5-pro",
-          "swarm-failover": "gemini-2.5-flash"
+          "trivial": "gemini-3.5-flash-lite",
+          "simple": "gemini-3.5-flash-lite",
+          "moderate": "gemini-3.8-flash",
+          "complex": "gemini-3.8-flash",
+          "light": "gemini-3.5-flash-lite",
+          "mid": "gemini-3.8-flash",
+          "heavy": "gemini-3.8-flash",
+          "failover": "gemini-3.5-flash-lite",
+          "swarm-light": "gemini-3.5-flash-lite",
+          "swarm-mid": "gemini-3.8-flash",
+          "swarm-heavy": "gemini-3.8-flash",
+          "swarm-failover": "gemini-3.5-flash-lite"
         }
       }
     },
@@ -254,7 +254,7 @@
       "name": "Codex CLI",
       "executor": "local",
       "bridge": "Skills/zo-swarm-executors/bridges/codex-bridge.sh",
-      "description": "OpenAI Codex CLI (Rust) \u2014 fastest local executor (~3s per call). Code generation, shell commands, file editing with full sandbox support.",
+      "description": "OpenAI Codex CLI (Rust) — fastest local executor (~3s per call). Code generation, shell commands, file editing with full sandbox support.",
       "expertise": [
         "code-generation",
         "code-review",
@@ -588,7 +588,7 @@
       "id": "mimir",
       "name": "Mimir Memory Sage",
       "executor": "local",
-      "description": "Mimir 2nd Brain memory sage \u2014 queries the memory gate for historical context, synthesis, and institutional knowledge. Used as a DAG node to inject context into downstream tasks.",
+      "description": "Mimir 2nd Brain memory sage — queries the memory gate for historical context, synthesis, and institutional knowledge. Used as a DAG node to inject context into downstream tasks.",
       "expertise": [
         "memory",
         "context",

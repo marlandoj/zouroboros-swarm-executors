@@ -19,7 +19,7 @@ const DAEMON_SOCKET = "/tmp/gemini-daemon.sock";
 const DAEMON_PID_FILE = "/tmp/gemini-daemon.pid";
 const DAEMON_SCRIPT = new URL("./gemini-daemon.ts", import.meta.url).pathname;
 const PING_TIMEOUT_MS = 20000;
-const DEFAULT_MODEL = "gemini-2.5-flash";
+const DEFAULT_MODEL = "gemini-3.5-flash-lite";
 
 interface WarmupOptions {
   daemon?: boolean;

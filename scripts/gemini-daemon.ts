@@ -21,7 +21,7 @@ import { existsSync, unlinkSync, writeFileSync, readFileSync } from "fs";
 const SOCKET_PATH = "/tmp/gemini-daemon.sock";
 const PID_FILE = "/tmp/gemini-daemon.pid";
 const LOG_FILE = "/dev/shm/gemini-daemon.log";
-const DEFAULT_MODEL = "gemini-2.5-flash";
+const DEFAULT_MODEL = "gemini-3.5-flash-lite";
 const MAX_CONCURRENT = 4;
 const IDLE_TIMEOUT_MS = 30 * 60 * 1000;
 
