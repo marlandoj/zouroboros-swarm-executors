@@ -1,4 +1,4 @@
-> **⚠️ DEPRECATED** — This repository has been archived. All code has been migrated to the [Zouroboros monorepo](https://github.com/marlandoj/Zouroboros) under `packages/swarm/src/executor/`. Please open issues and PRs there.
+> **Compatibility repository.** Executor policy lives in [zouroboros-workspace/packages/swarm](https://github.com/marlandoj/zouroboros-workspace/tree/main/packages/swarm). Bridges and registry tools forward there; `registry/executor-registry.json` is a byte-identical generated copy. Edit the package registry, then run `bun packages/swarm/scripts/sync-runtime-copies.ts --write` from the complete workspace. Do not edit the generated copy.
 
 ---
 
@@ -16,7 +16,7 @@
 
 This skill manages the local executors that power the [zouroboros-swarm-orchestrator](https://github.com/marlandoj/zouroboros-swarm-orchestrator). Instead of routing every task through a remote API, the orchestrator can send work to CLI tools running on your machine:
 
-- **8 Built-in CLI Executors** -- Claude Code, Hermes, Gemini, Codex, OpenCode, Kimi, Pi, and Cursor, plus the Mimir memory transport
+- **7 Active CLI Executors** -- Claude Code, Hermes, Gemini, Codex, OpenCode, Kimi, and Pi. Cursor is deferred; Mimir is service metadata, not an active CLI transport
 - **Shared Identity** -- All executors read the same SOUL.md, IDENTITY files, and memory system as API personas
 - **Simple Interface** -- A bridge script accepts a prompt on stdin and returns text on stdout. That's the whole contract
 - **Health Checks** -- Doctor script validates all bridges, environment variables, and CLI tools
@@ -35,7 +35,7 @@ Hermes runs through native ACP by default using `hermes acp --accept-hooks`, whi
 | OpenCode | `opencode` | ~10-120s | Vendor-neutral provider/model routing, repository-aware implementation |
 | Kimi | `kimi` | provider-dependent | Native ACP, large-context coding, multimodal tasks, MCP forwarding |
 | Pi | `pi` | provider-dependent | Minimal-harness coding, focused implementation, model comparisons |
-| Cursor | `cursor-agent` | provider-dependent | Cursor rules, repository-aware implementation, MCP-enabled coding |
+| Cursor (deferred) | `cursor-agent` | provider-dependent | Cursor rules, repository-aware implementation, MCP-enabled coding |
 
 ---
 
