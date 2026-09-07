@@ -111,13 +111,6 @@
           "OPENROUTER_API_KEY": "Required when using the openrouter provider"
         }
       },
-      "providerTierMap": {
-        "swarm-light": "deepseek",
-        "swarm-mid": "deepseek",
-        "swarm-heavy": "deepseek",
-        "swarm-failover": "xai",
-        "default": "deepseek"
-      },
       "healthCheck": {
         "command": "hermes acp --check",
         "expectedPattern": "Hermes ACP check OK",
@@ -275,7 +268,7 @@
         "defaultTimeout": 600,
         "model": "swarm-failover",
         "envVars": {
-          "CODEX_MODEL": "Override model (e.g., o3, gpt-4.1)",
+          "CODEX_MODEL": "Override model (e.g., gpt-5.6-terra, gpt-6-astra)",
           "CODEX_TIMEOUT": "Timeout in seconds (default: 300)"
         }
       },
@@ -317,7 +310,7 @@
       ],
       "config": {
         "defaultTimeout": 600,
-        "model": "synthetic-new/hf:zai-org/GLM-5.2",
+        "model": "synthetic-new/hf:zai-org/GLM-5.3-Flash",
         "envVars": {
           "SWARM_OPENCODE_ENABLED": "Set to 1 to include OpenCode in automatic swarm routing",
           "SF_OPENCODE_ENABLED": "Set to 1 to include OpenCode in the Software Factory chain"
@@ -355,7 +348,7 @@
           },
           "synthetic-new": {
             "endpointClass": "synthetic-direct",
-            "credentialEnv": "SYNTHETIC_NEW_API_KEY",
+            "credentialEnv": "SYNTHETIC_API_KEY",
             "launchConfig": {
               "envVar": "OPENCODE_CONFIG_CONTENT",
               "value": {
@@ -364,15 +357,15 @@
                     "name": "Synthetic.new",
                     "npm": "@ai-sdk/openai-compatible",
                     "env": [
-                      "SYNTHETIC_NEW_API_KEY"
+                      "SYNTHETIC_API_KEY"
                     ],
                     "options": {
                       "baseURL": "https://api.synthetic.new/openai/v1",
-                      "apiKey": "{env:SYNTHETIC_NEW_API_KEY}"
+                      "apiKey": "{env:SYNTHETIC_API_KEY}"
                     },
                     "models": {
-                      "hf:zai-org/GLM-5.2": {
-                        "name": "GLM-5.2",
+                      "hf:zai-org/GLM-5.3-Flash": {
+                        "name": "GLM-5.3-Flash",
                         "family": "glm",
                         "tool_call": true
                       }
@@ -397,7 +390,7 @@
         }
       },
       "modelRouter": {
-        "defaultModel": "synthetic-new/hf:zai-org/GLM-5.2",
+        "defaultModel": "synthetic-new/hf:zai-org/GLM-5.3-Flash",
         "fallbackModel": "xai/grok-build-0.1",
         "passthrough": true,
         "rejectPrefixes": [
