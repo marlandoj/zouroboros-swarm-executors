@@ -7,12 +7,12 @@
 #
 # Usage:
 #   source memory-inject.sh
-#   MEMORY_CONTEXT=$(inject_memory "codex" "/home/workspace")
+#   MEMORY_CONTEXT=$(inject_memory "codex" "/opt/zouroboros/repo")
 # =============================================================================
 
 inject_memory() {
   local PERSONA="${1:-generic}"
-  local WORKDIR="${2:-/home/workspace}"
+  local WORKDIR="${2:-/opt/zouroboros/repo}"
   
   # Track injection status
   local INJECTION_STATUS="fresh"
@@ -20,15 +20,18 @@ inject_memory() {
   
   # 1. Session briefing from memory gate (Mimir layer)
   local SESSION_CTX=""
-  SESSION_CTX=$(curl -s -X POST http://localhost:7820/gate \
+  SESSION_CTX=$(curl -fsS --connect-timeout 2 --max-time 3 -X POST http://localhost:7820/gate \
     -H 'Content-Type: application/json' \
     -d "{\"message\":\"session context\",\"persona\":\"$PERSONA\"}" 2>/dev/null) || true
   
-  # 2. Fallback: direct memory CLI if gate unavailable
+  # 2. Fallback: deployed memory CLI, bounded so unavailable memory cannot hang a bridge.
+  local MEMORY_CLI="${ZO_MEMORY_CLI_PATH:-/home/zouroboros/Skills/zo-memory-system/scripts/memory.ts}"
   if [ -z "$SESSION_CTX" ] || [ "$SESSION_CTX" = "null" ]; then
-    if command -v bun &>/dev/null && [ -f "$HOME/.zo/memory/scripts/memory.ts" ]; then
-      SESSION_CTX=$(cd "$HOME/.zo/memory/scripts" && bun memory.ts hybrid "current session context" 2>/dev/null) || true
+    if command -v bun &>/dev/null && [ -f "$MEMORY_CLI" ]; then
+      SESSION_CTX=$(ZO_MEMORY_DB="${ZO_MEMORY_DB:-/var/lib/zouroboros/memory/shared-facts.db}" timeout 15 bun "$MEMORY_CLI" search "current session context" --limit 5 2>/dev/null) || SESSION_CTX=""
       INJECTION_SOURCE="memory_cli_fallback"
+    else
+      echo "MEMORY_WARN: gate unavailable and memory CLI missing: $MEMORY_CLI" >&2
     fi
   fi
   
@@ -77,6 +80,6 @@ check_memory_gate() {
 # If run directly (not sourced), execute injection
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
   PERSONA="${1:-generic}"
-  WORKDIR="${2:-/home/workspace}"
+  WORKDIR="${2:-/opt/zouroboros/repo}"
   inject_memory "$PERSONA" "$WORKDIR"
 fi
