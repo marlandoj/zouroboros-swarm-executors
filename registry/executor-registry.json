@@ -754,7 +754,7 @@
         "ragCorpus": "pi-sdk",
         "package": "@earendil-works/pi-coding-agent",
         "version": "0.82.1",
-        "runtimeVersion": "0.82.1",
+        "runtimeVersion": "0.73.1",
         "language": "typescript",
         "sourceType": "runtime-package",
         "reference": "packages/swarm/docs/executors/identities/pi.md",
