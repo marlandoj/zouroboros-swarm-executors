@@ -16,7 +16,7 @@ set -euo pipefail
 
 PROMPT="${1:?Usage: gemini-bridge.sh \"prompt\" [workdir]}"
 WORKDIR="${2:-/home/workspace}"
-DEFAULT_MODEL="gemini-2.5-flash"
+DEFAULT_MODEL="gemini-3.8-flash"
 
 # Priority: SWARM_RESOLVED_MODEL > GEMINI_MODEL > default
 _SWARM_MODEL="${SWARM_RESOLVED_MODEL:-}"
@@ -35,31 +35,24 @@ else
   esac
 fi
 
+source "/home/workspace/Skills/zo-swarm-executors/bridges/model-catalog-resolve.sh"
+
 # Resolve model: accept only Gemini-native names (gemini-* or gc/*).
-# Map swarm tier names to Gemini model aliases
-# swarm-light    → gemini-2.5-flash   (fast, cheap)
-# swarm-mid      → gemini-2.5-pro     (balanced)
-# swarm-heavy    → gemini-2.5-pro     (frontier — no separate Gemini "opus" tier)
-# swarm-failover → gemini-2.5-flash
+# Tier aliases are resolved from the qualified catalog and then use the static floor.
 
 case "$_SWARM_MODEL" in
-  swarm-light)    MODEL="gemini-2.5-flash" ;;
-  swarm-mid)      MODEL="gemini-2.5-pro" ;;
-  swarm-heavy)    MODEL="gemini-2.5-pro" ;;
-  swarm-failover) MODEL="gemini-2.5-flash" ;;
-  swarm-*)        MODEL="gemini-2.5-flash" ;;
-  light)          MODEL="gemini-2.5-flash" ;;
-  mid)            MODEL="gemini-2.5-pro" ;;
-  heavy)          MODEL="gemini-2.5-pro" ;;
-  failover)       MODEL="gemini-2.5-flash" ;;
+  swarm-light|light)    MODEL="$(catalog_model gemini light gemini-3.8-flash)" ;;
+  swarm-mid|mid)        MODEL="$(catalog_model gemini mid gemini-3.1-pro-preview)" ;;
+  swarm-heavy|heavy)    MODEL="$(catalog_model gemini heavy gemini-3.1-pro-preview)" ;;
+  swarm-failover|failover) MODEL="$(catalog_model gemini light gemini-3.8-flash)" ;;
+  swarm-*)              MODEL="$(catalog_model gemini light gemini-3.8-flash)" ;;
   gemini*|gc/*|models/*) MODEL="${_SWARM_MODEL#gc/}" ;;
   "")
     case "$_GEMINI_MODEL" in
-      swarm-light)    MODEL="gemini-2.5-flash" ;;
-      swarm-mid)      MODEL="gemini-2.5-pro" ;;
-      swarm-heavy)    MODEL="gemini-2.5-pro" ;;
-      swarm-failover) MODEL="gemini-2.5-flash" ;;
-      swarm-*)        MODEL="gemini-2.5-flash" ;;
+      swarm-light|light) MODEL="$(catalog_model gemini light gemini-3.8-flash)" ;;
+      swarm-mid|mid) MODEL="$(catalog_model gemini mid gemini-3.1-pro-preview)" ;;
+      swarm-heavy|heavy) MODEL="$(catalog_model gemini heavy gemini-3.1-pro-preview)" ;;
+      swarm-failover|failover|swarm-*) MODEL="$(catalog_model gemini light gemini-3.8-flash)" ;;
       gemini*|gc/*|models/*) MODEL="${_GEMINI_MODEL#gc/}" ;;
       "")             MODEL="$DEFAULT_MODEL" ;;
       *)

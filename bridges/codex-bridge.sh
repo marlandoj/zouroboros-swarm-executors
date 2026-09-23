@@ -36,21 +36,15 @@ else
   esac
 fi
 
-# Static fallback: map swarm tier names to Codex model aliases
-# swarm-light    → gpt-5.1-codex-mini (fast, cheap)
-# swarm-mid      → gpt-5.3-codex     (balanced)
-# swarm-heavy    → gpt-5.4           (frontier)
-# swarm-failover → gpt-5.1-codex-mini
+source "/home/workspace/Skills/zo-swarm-executors/bridges/model-catalog-resolve.sh"
+
+# Tier aliases resolve from the qualified catalog and then use the static floor.
 case "$RAW_MODEL" in
-  swarm-light)    CODEX_MODEL="gpt-5.1-codex-mini" ;;
-  swarm-mid)      CODEX_MODEL="gpt-5.3-codex" ;;
-  swarm-heavy)    CODEX_MODEL="gpt-5.4" ;;
-  swarm-failover) CODEX_MODEL="gpt-5.1-codex-mini" ;;
-  swarm-*)        CODEX_MODEL="gpt-5.1-codex-mini" ;;
-  light)          CODEX_MODEL="gpt-5.1-codex-mini" ;;
-  mid)            CODEX_MODEL="gpt-5.3-codex" ;;
-  heavy)          CODEX_MODEL="gpt-5.4" ;;
-  failover)       CODEX_MODEL="gpt-5.1-codex-mini" ;;
+  swarm-light|light) CODEX_MODEL="$(catalog_model codex light gpt-6-luna)" ;;
+  swarm-mid|mid) CODEX_MODEL="$(catalog_model codex mid gpt-6-sol)" ;;
+  swarm-heavy|heavy) CODEX_MODEL="$(catalog_model codex heavy gpt-6-astra)" ;;
+  swarm-failover|failover) CODEX_MODEL="$(catalog_model codex light gpt-6-luna)" ;;
+  swarm-*) CODEX_MODEL="$(catalog_model codex light gpt-6-luna)" ;;
   *)              CODEX_MODEL="$RAW_MODEL" ;;
 esac
 

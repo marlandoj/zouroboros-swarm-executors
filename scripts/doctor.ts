@@ -19,7 +19,7 @@ import type { ExecutorRegistry, ExecutorEntry } from "../types/executor";
 const WORKSPACE = process.env.SWARM_WORKSPACE || "/home/workspace";
 const REGISTRY_PATH =
   process.env.SWARM_EXECUTOR_REGISTRY ||
-  join(WORKSPACE, "Skills", "zo-swarm-executors", "registry", "executor-registry.json");
+  join(WORKSPACE, "packages", "swarm", "src", "executor", "registry", "executor-registry.json");
 
 interface CheckResult {
   executor: string;

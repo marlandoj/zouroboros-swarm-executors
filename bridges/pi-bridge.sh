@@ -5,6 +5,7 @@ PROMPT="${1:?Usage: pi-bridge.sh \"prompt\" [workdir]}"
 WORKDIR="${2:-/home/workspace}"
 TIMEOUT="${PI_TIMEOUT:-600}"
 MODEL="${PI_MODEL:-${SWARM_RESOLVED_MODEL:-openrouter/moonshotai/kimi-k3}}"
+source "/home/workspace/Skills/zo-swarm-executors/bridges/model-catalog-resolve.sh"
 
 if ! command -v pi >/dev/null 2>&1; then
   echo "ERROR: pi not found" >&2
@@ -12,8 +13,11 @@ if ! command -v pi >/dev/null 2>&1; then
 fi
 
 case "$MODEL" in
-  byok:*|swarm-*|trivial|simple|moderate|complex|light|mid|heavy|failover)
+  byok:*)
     MODEL="openrouter/moonshotai/kimi-k3"
+    ;;
+  swarm-*|trivial|simple|moderate|complex|light|mid|heavy|failover)
+    MODEL="$(catalog_model pi "$MODEL" openrouter/moonshotai/kimi-k3)"
     ;;
 esac
 

@@ -17,7 +17,7 @@ import type { ExecutorRegistry } from "../types/executor";
 const WORKSPACE = process.env.SWARM_WORKSPACE || "/home/workspace";
 const REGISTRY_PATH =
   process.env.SWARM_EXECUTOR_REGISTRY ||
-  join(WORKSPACE, "Skills", "zo-swarm-executors", "registry", "executor-registry.json");
+  join(WORKSPACE, "packages", "swarm", "src", "executor", "registry", "executor-registry.json");
 
 const TEST_PROMPT = 'Respond with exactly: BRIDGE_OK';
 const EXPECTED_PATTERN = "BRIDGE_OK";

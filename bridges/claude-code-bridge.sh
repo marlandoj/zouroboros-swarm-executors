@@ -20,46 +20,19 @@ set -euo pipefail
 PROMPT="${1:?Usage: claude-code-bridge.sh \"prompt\" [workdir]}"
 WORKDIR="${2:-/home/workspace}"
 
-# --- T2: Dynamic shared model resolution ---
-# Priority: SWARM_RESOLVED_MODEL → CLAUDE_CODE_MODEL → CLI default
+# --- Dynamic shared model resolution ---
+# Priority: SWARM_RESOLVED_MODEL → CLAUDE_CODE_MODEL → qualified catalog tier → floor
 RAW_MODEL="${SWARM_RESOLVED_MODEL:-${CLAUDE_CODE_MODEL:-}}"
 TIER="${SWARM_TIER:-}"
+source "/home/workspace/Skills/zo-swarm-executors/bridges/model-catalog-resolve.sh"
 
-# Attempt dynamic resolution via tier-resolve.ts — only when no model was passed in,
-# so explicit SWARM_RESOLVED_MODEL / CLAUDE_CODE_MODEL always win (documented priority)
-TIER_RESOLVE_SCRIPT="/home/workspace/Skills/zo-swarm-orchestrator/scripts/tier-resolve.ts"
-if [ -z "$RAW_MODEL" ] && [ -f "$TIER_RESOLVE_SCRIPT" ] && command -v bun &>/dev/null; then
-  RESOLVED_JSON=$(timeout 15 bun "$TIER_RESOLVE_SCRIPT" "$PROMPT" --json 2>/dev/null) || true
-  if [ -n "${RESOLVED_JSON:-}" ]; then
-    # tier-resolve.ts emits {tier, combo}; older versions emitted {resolvedCombo, complexity.tier}
-    RESOLVED_COMBO=$(echo "$RESOLVED_JSON" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('combo') or d.get('resolvedCombo') or '')" 2>/dev/null) || true
-    RESOLVED_TIER=$(echo "$RESOLVED_JSON" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('tier') or d.get('complexity',{}).get('tier') or '')" 2>/dev/null) || true
-    if [ -n "${RESOLVED_COMBO:-}" ]; then
-      RAW_MODEL="$RESOLVED_COMBO"
-    fi
-    if [ -z "$TIER" ] && [ -n "${RESOLVED_TIER:-}" ]; then
-      TIER="$RESOLVED_TIER"
-    fi
-  fi
-fi
-
-# Static fallback: map swarm tier names to Claude Code model aliases
-# swarm-light    → claude-haiku-4-5   (fast, cheap)
-# swarm-mid      → claude-sonnet-4-6  (balanced)
-# swarm-heavy    → claude-sonnet-4-6  (ZOU-397: Opus reserved for explicit override)
-# swarm-failover → claude-haiku-4-5
 case "$RAW_MODEL" in
-  swarm-light)    CLAUDE_CODE_MODEL="claude-haiku-4-5-20251001" ;;
-  swarm-mid)      CLAUDE_CODE_MODEL="claude-sonnet-4-6" ;;
-  swarm-heavy)    CLAUDE_CODE_MODEL="claude-sonnet-4-6" ;;
-  swarm-failover) CLAUDE_CODE_MODEL="claude-haiku-4-5-20251001" ;;
-  swarm-*)        CLAUDE_CODE_MODEL="claude-haiku-4-5-20251001" ;;
-  light)          CLAUDE_CODE_MODEL="claude-haiku-4-5-20251001" ;;
-  mid)            CLAUDE_CODE_MODEL="claude-sonnet-4-6" ;;
-  heavy)          CLAUDE_CODE_MODEL="claude-sonnet-4-6" ;;
-  failover)       CLAUDE_CODE_MODEL="claude-haiku-4-5-20251001" ;;
-  "")             CLAUDE_CODE_MODEL="claude-sonnet-4-6"
-                  echo "[claude-code-bridge] no model resolved — defaulting to claude-sonnet-4-6 (ZOU-397, was: CLI default)" >&2 ;;
+  swarm-light|light)    CLAUDE_CODE_MODEL="$(catalog_model claude-code light claude-haiku-4-5-20251001)" ;;
+  swarm-mid|mid)       CLAUDE_CODE_MODEL="$(catalog_model claude-code mid claude-sonnet-5)" ;;
+  swarm-heavy|heavy)   CLAUDE_CODE_MODEL="$(catalog_model claude-code heavy claude-opus-5.5)" ;;
+  swarm-failover|failover) CLAUDE_CODE_MODEL="$(catalog_model claude-code light claude-haiku-4-5-20251001)" ;;
+  swarm-*)             CLAUDE_CODE_MODEL="$(catalog_model claude-code light claude-haiku-4-5-20251001)" ;;
+  "")                 CLAUDE_CODE_MODEL="$(catalog_model claude-code mid claude-sonnet-5)" ;;
   *)              CLAUDE_CODE_MODEL="$RAW_MODEL" ;;
 esac
 

@@ -22,6 +22,12 @@ VENV_ACTIVATE="${HERMES_VENV:-$PROJECT_DIR/.venv/bin/activate}"
 # Priority: SWARM_RESOLVED_MODEL > LLM_MODEL
 RAW_MODEL="${SWARM_RESOLVED_MODEL:-${LLM_MODEL:-}}"
 TIER="${SWARM_TIER:-}"
+source "/home/workspace/Skills/zo-swarm-executors/bridges/model-catalog-resolve.sh"
+case "$RAW_MODEL" in
+  swarm-*|trivial|simple|moderate|complex|light|mid|heavy|failover)
+    RAW_MODEL="$(catalog_model hermes "$RAW_MODEL" swarm-failover)"
+    ;;
+esac
 
 # --- Per-tier timeout resolution ---
 if [ -n "${HERMES_TIMEOUT:-}" ]; then
