@@ -98,6 +98,20 @@
           "swarm-heavy": "claude-fable-5-1",
           "swarm-failover": "claude-haiku-4-5-20251001"
         }
+      },
+      "modelFamilies": [
+        {
+          "name": "anthropic-claude",
+          "sourcePrefixes": [
+            "anthropic/claude-"
+          ],
+          "stripPrefix": "anthropic/"
+        }
+      ],
+      "modelPins": {
+        "heavy": "claude-fable-5-1",
+        "mid": "claude-opus-5",
+        "light": "claude-haiku-4-5-20251001"
       }
     },
     {
@@ -205,6 +219,32 @@
         ],
         "runtimeStatus": "production-runtime",
         "promotionRequired": false
+      },
+      "modelFamilies": [
+        {
+          "name": "openrouter-agentic",
+          "sourcePrefixes": [
+            "anthropic/claude-",
+            "openai/gpt-",
+            "google/gemini-",
+            "x-ai/",
+            "z-ai/"
+          ]
+        }
+      ],
+      "modelRouter": {
+        "passthrough": true,
+        "fallbackModel": "claude-haiku-4-5-20251001",
+        "defaultModel": "claude-opus-5",
+        "tierMap": {
+          "mid": "claude-opus-5",
+          "light": "claude-haiku-4-5-20251001",
+          "moderate": "claude-opus-5",
+          "complex": "claude-fable-5-1",
+          "simple": "claude-haiku-4-5-20251001",
+          "trivial": "claude-haiku-4-5-20251001",
+          "heavy": "claude-fable-5-1"
+        }
       }
     },
     {
@@ -336,7 +376,16 @@
           "swarm-heavy": "gemini-3.8-flash",
           "swarm-failover": "gemini-3.5-flash-lite"
         }
-      }
+      },
+      "modelFamilies": [
+        {
+          "name": "google-gemini",
+          "sourcePrefixes": [
+            "google/gemini-"
+          ],
+          "stripPrefix": "google/"
+        }
+      ]
     },
     {
       "id": "codex",
@@ -410,6 +459,36 @@
         ],
         "runtimeStatus": "indexed-reference",
         "promotionRequired": true
+      },
+      "modelFamilies": [
+        {
+          "name": "openai-coding",
+          "sourcePrefixes": [
+            "openai/gpt-"
+          ]
+        }
+      ],
+      "modelRouter": {
+        "acceptedPrefixes": [
+          "gpt-",
+          "o"
+        ],
+        "fallbackModel": "gpt-5.6-luna",
+        "defaultModel": "gpt-5.6-terra",
+        "tierMap": {
+          "light": "gpt-5.6-luna",
+          "mid": "gpt-5.6-terra",
+          "heavy": "gpt-6-astra",
+          "swarm-mid": "gpt-5.6-terra",
+          "simple": "gpt-5.6-luna",
+          "trivial": "gpt-5.6-luna",
+          "moderate": "gpt-5.6-terra",
+          "complex": "gpt-6-astra",
+          "failover": "gpt-5.6-luna",
+          "swarm-light": "gpt-5.6-luna",
+          "swarm-heavy": "gpt-6-astra",
+          "swarm-failover": "gpt-5.6-luna"
+        }
       }
     },
     {
@@ -437,7 +516,7 @@
       ],
       "config": {
         "defaultTimeout": 600,
-        "model": "synthetic-new/hf:zai-org/GLM-5.3-Flash",
+        "model": "synthetic-direct/hf:zai-org/GLM-5.3-Flash",
         "envVars": {
           "SWARM_OPENCODE_ENABLED": "Set to 1 to include OpenCode in automatic swarm routing",
           "SF_OPENCODE_ENABLED": "Set to 1 to include OpenCode in the Software Factory chain"
@@ -475,14 +554,14 @@
             "endpointClass": "opencode-zen",
             "credentialEnv": "OPENCODE_API_KEY"
           },
-          "synthetic-new": {
+          "synthetic-direct": {
             "endpointClass": "synthetic-direct",
             "credentialEnv": "SYNTHETIC_API_KEY",
             "launchConfig": {
               "envVar": "OPENCODE_CONFIG_CONTENT",
               "value": {
                 "provider": {
-                  "synthetic-new": {
+                  "synthetic-direct": {
                     "name": "Synthetic.new",
                     "npm": "@ai-sdk/openai-compatible",
                     "env": [
@@ -525,25 +604,25 @@
         }
       },
       "modelRouter": {
-        "defaultModel": "synthetic-new/hf:zai-org/GLM-5.3-Flash",
-        "fallbackModel": "xai/grok-build-0.1",
+        "defaultModel": "synthetic-direct/hf:zai-org/GLM-5.3-Flash",
+        "fallbackModel": "synthetic-direct/hf:zai-org/GLM-5.3-Flash",
         "passthrough": true,
         "rejectPrefixes": [
           "byok:"
         ],
         "tierMap": {
-          "trivial": "openrouter/openai/gpt-oss-20b:free",
-          "simple": "synthetic-new/hf:zai-org/GLM-5.3-Flash",
-          "moderate": "synthetic-new/hf:zai-org/GLM-5.3-Flash",
-          "complex": "xai/grok-build-0.1",
-          "light": "openrouter/openai/gpt-oss-20b:free",
-          "mid": "synthetic-new/hf:zai-org/GLM-5.3-Flash",
-          "heavy": "xai/grok-build-0.1",
-          "failover": "xai/grok-build-0.1",
-          "swarm-light": "openrouter/openai/gpt-oss-20b:free",
-          "swarm-mid": "synthetic-new/hf:zai-org/GLM-5.3-Flash",
-          "swarm-heavy": "xai/grok-build-0.1",
-          "swarm-failover": "xai/grok-build-0.1"
+          "trivial": "synthetic-direct/hf:zai-org/GLM-5.3-Flash",
+          "simple": "synthetic-direct/hf:zai-org/GLM-5.3-Flash",
+          "moderate": "synthetic-direct/hf:zai-org/GLM-5.3-Flash",
+          "complex": "synthetic-direct/hf:zai-org/GLM-5.3-Flash",
+          "light": "synthetic-direct/hf:zai-org/GLM-5.3-Flash",
+          "mid": "synthetic-direct/hf:zai-org/GLM-5.3-Flash",
+          "heavy": "synthetic-direct/hf:zai-org/GLM-5.3-Flash",
+          "failover": "synthetic-direct/hf:zai-org/GLM-5.3-Flash",
+          "swarm-light": "synthetic-direct/hf:zai-org/GLM-5.3-Flash",
+          "swarm-mid": "synthetic-direct/hf:zai-org/GLM-5.3-Flash",
+          "swarm-heavy": "synthetic-direct/hf:zai-org/GLM-5.3-Flash",
+          "swarm-failover": "synthetic-direct/hf:zai-org/GLM-5.3-Flash"
         }
       },
       "sdk": {
@@ -570,7 +649,22 @@
       "rollout": {
         "autoRoutingEnv": "SWARM_OPENCODE_ENABLED",
         "factoryRoutingEnv": "SF_OPENCODE_ENABLED"
-      }
+      },
+      "modelFamilies": [
+        {
+          "name": "openrouter-agentic",
+          "sourcePrefixes": [
+            "anthropic/",
+            "google/",
+            "openai/",
+            "x-ai/",
+            "z-ai/",
+            "moonshotai/",
+            "deepseek/",
+            "meta-llama/"
+          ]
+        }
+      ]
     },
     {
       "id": "kimi",
@@ -598,7 +692,7 @@
       ],
       "config": {
         "defaultTimeout": 600,
-        "model": "moonshotai/kimi-k3",
+        "model": "kimi-k3",
         "envVars": {
           "KIMI_MODEL_API_KEY": "Optional explicit Kimi-compatible provider key",
           "KIMI_MODEL_BASE_URL": "Optional OpenAI-compatible provider base URL",
@@ -634,26 +728,27 @@
         "endpointClass": "kimi-compatible"
       },
       "modelRouter": {
-        "defaultModel": "moonshotai/kimi-k3",
-        "fallbackModel": "moonshotai/kimi-k3",
+        "defaultModel": "kimi-k3",
+        "fallbackModel": "kimi-k3",
         "acceptedPrefixes": [
-          "moonshotai/",
-          "k3",
-          "kimi-for-coding"
+          "kimi-",
+          "synthetic/",
+          "hf:moonshotai/",
+          "moonshotai/"
         ],
         "tierMap": {
-          "trivial": "moonshotai/kimi-k3",
-          "simple": "moonshotai/kimi-k3",
-          "moderate": "moonshotai/kimi-k3",
-          "complex": "moonshotai/kimi-k3",
-          "light": "moonshotai/kimi-k3",
-          "mid": "moonshotai/kimi-k3",
-          "heavy": "moonshotai/kimi-k3",
-          "failover": "moonshotai/kimi-k3",
-          "swarm-light": "moonshotai/kimi-k3",
-          "swarm-mid": "moonshotai/kimi-k3",
-          "swarm-heavy": "moonshotai/kimi-k3",
-          "swarm-failover": "moonshotai/kimi-k3"
+          "trivial": "kimi-k3",
+          "simple": "kimi-k3",
+          "moderate": "kimi-k3",
+          "complex": "kimi-k3",
+          "light": "kimi-k3",
+          "mid": "kimi-k3",
+          "heavy": "kimi-k3",
+          "failover": "kimi-k3",
+          "swarm-light": "kimi-k3",
+          "swarm-mid": "kimi-k3",
+          "swarm-heavy": "kimi-k3",
+          "swarm-failover": "kimi-k3"
         }
       },
       "sdk": {
@@ -684,7 +779,15 @@
         "imageGen": false,
         "mcp": true,
         "streaming": true
-      }
+      },
+      "modelFamilies": [
+        {
+          "name": "moonshot-kimi",
+          "sourcePrefixes": [
+            "moonshotai/"
+          ]
+        }
+      ]
     },
     {
       "id": "pi",
@@ -736,7 +839,7 @@
       "transport": "bridge",
       "modelRouter": {
         "defaultModel": "openrouter/moonshotai/kimi-k3",
-        "fallbackModel": "openrouter/~moonshotai/kimi-latest",
+        "fallbackModel": "openrouter/moonshotai/kimi-k3",
         "passthrough": true,
         "rejectPrefixes": [
           "byok:"
@@ -749,11 +852,11 @@
           "light": "openrouter/moonshotai/kimi-k3",
           "mid": "openrouter/moonshotai/kimi-k3",
           "heavy": "openrouter/moonshotai/kimi-k3",
-          "failover": "openrouter/~moonshotai/kimi-latest",
+          "failover": "openrouter/moonshotai/kimi-k3",
           "swarm-light": "openrouter/moonshotai/kimi-k3",
           "swarm-mid": "openrouter/moonshotai/kimi-k3",
           "swarm-heavy": "openrouter/moonshotai/kimi-k3",
-          "swarm-failover": "openrouter/~moonshotai/kimi-latest"
+          "swarm-failover": "openrouter/moonshotai/kimi-k3"
         }
       },
       "sdk": {
@@ -786,107 +889,18 @@
         "imageGen": false,
         "mcp": true,
         "streaming": false
-      }
+      },
+      "modelFamilies": [
+        {
+          "name": "openrouter-kimi",
+          "sourcePrefixes": [
+            "moonshotai/"
+          ]
+        }
+      ]
     }
   ],
-  "deferredExecutors": [
-    {
-      "id": "cursor",
-      "name": "Cursor CLI",
-      "executor": "local",
-      "bridge": "packages/swarm/src/executor/bridges/cursor-bridge.sh",
-      "description": "Cursor Agent in isolated noninteractive print mode with repository rules, MCP support, JSON result extraction, and task-scoped model selection",
-      "expertise": [
-        "code-generation",
-        "code-review",
-        "debugging",
-        "refactoring",
-        "testing",
-        "shell-commands",
-        "file-editing",
-        "repository-rules",
-        "mcp"
-      ],
-      "best_for": [
-        "Repository-aware implementation",
-        "Cursor rules and AGENTS.md guided changes",
-        "Focused refactoring and debugging",
-        "MCP-enabled coding tasks",
-        "Approved noninteractive swarm mutations"
-      ],
-      "config": {
-        "defaultTimeout": 600,
-        "model": "auto",
-        "envVars": {
-          "CURSOR_AGENT_BIN": "Optional cursor-agent binary override",
-          "CURSOR_API_KEY": "Optional automation credential; browser login is also supported",
-          "CURSOR_MODEL": "Optional concrete Cursor model override (default: auto)",
-          "CURSOR_TIMEOUT": "Bridge timeout in seconds (default: 600)",
-          "CURSOR_FORCE": "Set to 0 to omit --force (default: 1)"
-        }
-      },
-      "healthCheck": {
-        "command": "bash packages/swarm/src/executor/bridges/cursor-health.sh",
-        "expectedPattern": "cursor-agent authenticated",
-        "description": "Verify Cursor Agent is installed and authenticated"
-      },
-      "transport": "bridge",
-      "modelRouter": {
-        "defaultModel": "auto",
-        "fallbackModel": "auto",
-        "passthrough": true,
-        "rejectPrefixes": [
-          "byok:"
-        ],
-        "tierMap": {
-          "trivial": "auto",
-          "simple": "auto",
-          "moderate": "auto",
-          "complex": "auto",
-          "light": "auto",
-          "mid": "auto",
-          "heavy": "auto",
-          "failover": "auto",
-          "swarm-light": "auto",
-          "swarm-mid": "auto",
-          "swarm-heavy": "auto",
-          "swarm-failover": "auto"
-        }
-      },
-      "sdk": {
-        "ragCorpus": "cursor-sdk",
-        "package": "@cursor/sdk",
-        "version": "1.0.26",
-        "runtimeVersion": "2026.07.23-e383d2b",
-        "language": "typescript",
-        "sourceType": "official-sdk-and-docs",
-        "reference": "packages/swarm/docs/executors/identities/cursor.md",
-        "surfaces": [
-          "local-agents",
-          "cloud-agents",
-          "event-streaming",
-          "custom-tools",
-          "automated-review",
-          "jsonl-store",
-          "custom-store",
-          "nested-subagents",
-          "headless-cli",
-          "mcp"
-        ],
-        "runtimeStatus": "installed-auth-required",
-        "promotionRequired": true
-      },
-      "capabilities": {
-        "fileRead": true,
-        "fileWrite": true,
-        "shellExec": true,
-        "webResearch": false,
-        "imageGen": false,
-        "mcp": true,
-        "streaming": false
-      }
-    }
-  ],
+  "deferredExecutors": [],
   "services": [
     {
       "id": "mimir",
